@@ -1,12 +1,17 @@
-import os
 import json
+import logging
+import os
 
-import requests
 import dataset
+import requests
 
 
 FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
             'exclude_system_fields=false')
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def get_config():
@@ -27,12 +32,21 @@ def scrapeActiveCalls(*args):
     db = dataset.connect(config.get('database', ''))
     calls_table = db['calls']
 
+    original_count = calls_table.count()
+
     r = requests.get(FEED_URL)
     r.raise_for_status()
 
     for active_call in r.json():
         calls_table.upsert(active_call, ['incident_number'])
 
+    num_added = calls_table.count() - original_count
+
+    logger.info(
+        'Scraped %s active calls (%s new).' % (len(r.json()), num_added)
+    )
+
 
 if __name__ == '__main__':
+    logging.basicConfig()
     scrapeActiveCalls()
