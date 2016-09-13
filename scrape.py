@@ -43,8 +43,13 @@ def parse_time(time_str):
 
 
 def generate_csv_report(from_time):
-    """Generate a CSV that has all rows since from_time (UTC)"""
+    """Generate a CSV that has all rows since from_time (UTC), minus system
+    columns."""
     calls_table_cols = db['calls'].columns
+
+    cols_to_exclude = [':updated_at_dt', ':created_at_dt', ':id',
+                       ':updated_at', ':created_at', 'date_time_dt']
+    csv_cols = [c for c in calls_table_cols if c not in cols_to_exclude]
 
     from_time_string = datetime.strftime(from_time, '%Y-%m-%dT%H:%M:%S')
     q = ('select * from calls '
@@ -53,7 +58,7 @@ def generate_csv_report(from_time):
     calls = db.query(q % from_time_string)
 
     outfile = StringIO.StringIO()
-    csv_out = csv.DictWriter(outfile, calls_table_cols)
+    csv_out = csv.DictWriter(outfile, csv_cols, extrasaction='ignore')
 
     csv_out.writeheader()
 
