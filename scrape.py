@@ -11,7 +11,7 @@ import requests
 
 FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
             'exclude_system_fields=false')
-REPORT_RECIPIENTS = ('ttiasperas@dallasnews.com',)
+REPORT_RECIPIENTS = ('ttsiaperas@dallasnews.com', 'nrajwani@dallasnews.com',)
 REPORT_TIME = time(14)  # in UTC Time
 
 
