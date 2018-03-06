@@ -8,9 +8,6 @@ PSYCOPG2_DIR="$PWD/lambda-psycopg2"
 
 [ -f "$OUTFILE" ] && echo "* Removing existing lambda.zip" && rm $OUTFILE
 
-echo "* Packaging config file"
-zip -9 $OUTFILE config.json > /dev/null
-
 echo "* Packaging site-packges from virtual environment"
 [ -d "$SITE_PACKAGES" ] && cd $SITE_PACKAGES && zip -r9 $OUTFILE * > /dev/null
 [ -d "$SITE_PACKAGES_64" ] && cd $SITE_PACKAGES_64 && zip -r9 $OUTFILE * > /dev/null

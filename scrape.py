@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime, time, timedelta
-import json
 import logging
 import os
 import StringIO
@@ -19,19 +18,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def get_config():
-    """Load our app config from JSON in the project root"""
-    app_dir = os.path.dirname(os.path.realpath(__file__))
-    config_file_path = os.path.join(app_dir, 'config.json')
-
-    with open(config_file_path, 'r') as config_file:
-        config = config_file.read()
-
-    return json.loads(config)
-
-
-config = get_config()
-db = dataset.connect(config.get('database', ''))
+db = dataset.connect(os.environ.get('database', ''))
 
 
 def parse_time(time_str):
@@ -100,8 +87,10 @@ def send_daily_report():
 
     # Send using the Mailgun API
     r = requests.post(
-        'https://api.mailgun.net/v2/%s/messages' % config.get('mailgunDomain'),
-        auth=('api', config.get('mailgunApiKey', '')),
+        'https://api.mailgun.net/v2/%s/messages' % os.environ.get(
+            'mailgunDomain'
+        ),
+        auth=('api', os.environ.get('mailgunApiKey', '')),
         files=[
             ('attachment', (report_filename, csv_report.read()))
         ],

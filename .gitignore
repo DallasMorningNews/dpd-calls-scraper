@@ -152,8 +152,7 @@ pip-selfcheck.json
 
 
 ### App files ###
-# secrets
-config.json
+
 # Lambda-ready package
 lambda.zip
 lambda-psycopg2/

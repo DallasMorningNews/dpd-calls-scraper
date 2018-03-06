@@ -1,5 +1,0 @@
-{
-  "database": "postgres://user:pw@host/db_name",
-  "mailgunApiKey": "key-api-key",
-  "mailgunDomain": "domain.mailgun.com"
-}
