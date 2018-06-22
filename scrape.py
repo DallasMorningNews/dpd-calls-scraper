@@ -130,7 +130,11 @@ def scrape_active_calls(*args):
             ':updated_at_dt': parse_time(active_call[':updated_at'])
         }
         active_call.update(**parsed_dates)
-        calls_table.upsert(active_call, ['incident_number'])
+        active_call['incident_element_id'] = '%s-%s' % (
+            active_call['incident_id'],
+            active_call['unit_number']
+        )
+        calls_table.upsert(active_call, ['incident_element_id'])
 
     num_added = calls_table.count() - original_count
 
