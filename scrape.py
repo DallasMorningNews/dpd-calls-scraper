@@ -131,7 +131,7 @@ def scrape_active_calls(*args):
         }
         active_call.update(**parsed_dates)
         active_call['incident_element_id'] = '%s-%s' % (
-            active_call['incident_id'],
+            active_call['incident_number'],
             active_call['unit_number']
         )
         calls_table.upsert(active_call, ['incident_element_id'])
