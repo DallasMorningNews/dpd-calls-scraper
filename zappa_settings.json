@@ -1,0 +1,23 @@
+{
+    "production": {
+        "apigateway_enabled": false,
+        "app_function": "service.scrape_active_calls",
+        "aws_region": "us-east-1",
+        "events": [{
+          "function": "service.send_daily_report",
+          "expressions": ["cron(0 14 * * ? *)"]
+        }, {
+          "function": "service.scrape_active_calls",
+          "expressions": ["rate(10 minutes)"]
+        }],
+        "keep_warm": false,
+        "lambda_description": "Scraper that hits DPD's active calls list and stores them in a database",
+        "manage_roles": false,
+        "profile_name": null,
+        "project_name": "dpd-calls-scraper",
+        "role_name": "lambda_basic_execution",
+        "runtime": "python3.6",
+        "s3_bucket": "dmn-lambda-deploys",
+        "timeout_seconds": 180
+    }
+}

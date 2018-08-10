@@ -4,22 +4,34 @@ This scraper runs on AWS Lambda and scrapes DPD's [active calls list](https://ww
 
 It also sends a CSV once per day (at 9 a.m.) with the past 25 hour of calls.
 
+## Requirements
+
+- Python 3.6 - `brew install python3`
+- Pipenv - `brew install pipenv`
+
 ## Local development
 
-1. Create a Python 2.7 virtual environment: `virtualenv venv`
-2. Install requirements: `pip install -r requirements.txt`
-3. Copy _[config.example.json](config.json.example)_ to _config.json_ and fill in the required security credentials.
+### Installation
 
-## Deploying to Lambda
+1. Install dependencies:
+    ```sh
+    $ pipenv install --development
+    ```
 
-The easiest way to package the script for deployment to Lambda is to run the included [packaging script](package.sh) from within the app's root directory while in the virtual environment. It will:
+2. Copy the _.env.example_ to _.env_ and add AWS credentials (required for deployment) a `DATABASE_URL` (required to test storage to PostgreSQL), Mailgun credentials (to test e-mail feature) and, optionally, set `REPORT_RECIPIENTS` to a comma-separated list of everyone you'd like to receive daily reports.
 
-1. Create a .zip file in the root with all of our custom code (anything with a .py extension in the project root).
-2. Copy the site packages folder from our virtual environment into the .zip file, [as required by Lambda](http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html).
-3. Download a version of `psycopg2` that's [built for Amazon Linux](https://github.com/jkehler/awslambda-psycopg2) and package it with our code in the .zip file.
+### Deploying
 
-The .zip that's output, which will be saved as _lambda.zip_ in the project root, can now be uploaded to the AWS console.
+Deployment to Lambda and management of scheduled tasks (scraping and daily report sending) are handled by `zappa`. Deploy updates with:
+
+```sh
+$ pipenv run zappa update
+```
+
+See the [complete Zappa docs](https://github.com/Miserlou/Zappa) for a full list of available commands to manage the app's configuration.
+
+Environment variables can be updated using this function's Lambda configuration in the AWS console.
 
 ## Copyright
 
-&copy; 2016 The Dallas Morning News
+&copy; 2018 The Dallas Morning News

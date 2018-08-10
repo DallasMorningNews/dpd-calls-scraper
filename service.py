@@ -1,5 +1,6 @@
 import csv
-from datetime import datetime, time, timedelta
+from datetime import datetime
+from datetiem import timedelta
 import logging
 import os
 import StringIO
@@ -10,15 +11,13 @@ import requests
 
 FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
             'exclude_system_fields=false')
-REPORT_RECIPIENTS = ('ttsiaperas@dallasnews.com', 'nrajwani@dallasnews.com',)
-REPORT_TIME = time(14)  # in UTC Time
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-db = dataset.connect(os.environ.get('database', ''))
+db = dataset.connect(os.environ.get('DATABASE_URL', ''))
 
 
 def parse_time(time_str):
@@ -57,21 +56,10 @@ def generate_csv_report(from_time):
     return outfile
 
 
-def send_daily_report():
+def send_daily_report(*args):
     """Send a CSV with the last 25 hours of incident data"""
-    todays_report_time = datetime.combine(
-        datetime.today(),
-        REPORT_TIME
-    )
-
-    if datetime.now() < todays_report_time:
-        logger.info('Skipping daily report. It\'s not time yet.')
-        return
-
-    report_log = db['report_log']
-
-    if report_log.find_one(report_time=todays_report_time) is not None:
-        logger.info('Skipping daily report. Already sent today.')
+    if not os.environ.get('REPORT_RECIPIENTS') is None:
+        logger.info('Skipping daily report because REPORT_RECIPIENTS is empty')
         return
 
     logger.info('E-mailing daily report.')
@@ -81,35 +69,38 @@ def send_daily_report():
     csv_report = generate_csv_report(from_datetime)
 
     report_filename = '%s-daily-report.csv' % datetime.strftime(
-        from_datetime, '%Y%m%d')
+        from_datetime, '%Y%m%d'
+    )
     msg_text = 'CSV file with past 25 hours of DPD calls for service attached.'
-    to_addresses = ', '.join(REPORT_RECIPIENTS)
+
+    to_addresses = ', '.join([
+        _.strip() for _ in os.environ['REPORT_RECIPIENTS'].split(',')
+    ])
 
     # Send using the Mailgun API
     r = requests.post(
         'https://api.mailgun.net/v2/%s/messages' % os.environ.get(
-            'mailgunDomain'
+            'MAILGUN_DOMAIN'
         ),
-        auth=('api', os.environ.get('mailgunApiKey', '')),
+        auth=('api', os.environ.get('MAILGUN_API_KEY', '')),
         files=[
             ('attachment', (report_filename, csv_report.read()))
         ],
         data={
             'from': 'Active call bot <no-reply@postbox.dallasnews.com>',
             'to': to_addresses,
-            'bcc': 'achavez@dallasnews.com',
             'subject': 'DPD calls for %s' % datetime.strftime(
-                from_datetime, '%m/%d'),
-            'text': '%s' % msg_text,
-            'html': '<html>%s</html>' % msg_text
+                from_datetime, '%m/%d'
+            ),
+            'text': msg_text
         }
     )
     r.raise_for_status()
 
-    report_log.insert(dict(
+    db['report_log'].insert(dict(
         recipients=to_addresses,
         type='daily',
-        report_time=todays_report_time,
+        report_time=datetime.now(),
         time_sent=datetime.now()
     ))
 
@@ -141,8 +132,6 @@ def scrape_active_calls(*args):
     logger.info(
         'Scraped %s active calls (%s new).' % (len(r.json()), num_added)
     )
-
-    send_daily_report()
 
 
 if __name__ == '__main__':
