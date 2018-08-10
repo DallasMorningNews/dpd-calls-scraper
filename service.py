@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from datetiem import timedelta
+from datetime import timedelta
 import logging
 import os
 import StringIO
