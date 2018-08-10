@@ -1,9 +1,9 @@
 import csv
 from datetime import datetime
 from datetime import timedelta
+from io import StringIO
 import logging
 import os
-import StringIO
 
 import dataset
 import requests
@@ -43,7 +43,7 @@ def generate_csv_report(from_time):
          'order by date_time_dt desc')
     calls = db.query(q % from_time_string)
 
-    outfile = StringIO.StringIO()
+    outfile = StringIO()
     csv_out = csv.DictWriter(outfile, csv_cols, extrasaction='ignore')
 
     csv_out.writeheader()
