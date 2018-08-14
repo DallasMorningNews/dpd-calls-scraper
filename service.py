@@ -58,7 +58,7 @@ def generate_csv_report(from_time):
 
 def send_daily_report(*args):
     """Send a CSV with the last 25 hours of incident data"""
-    if not os.environ.get('REPORT_RECIPIENTS') is None:
+    if os.environ.get('REPORT_RECIPIENTS') is None:
         logger.info('Skipping daily report because REPORT_RECIPIENTS is empty')
         return
 
