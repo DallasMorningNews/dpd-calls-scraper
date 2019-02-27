@@ -107,6 +107,12 @@ def send_daily_report(*args):
 
 def scrape_active_calls(*args):
     """Scrape active calls and save them into our database"""
+    if 'HEALTHCHECK_URL' in os.environ:
+        try:
+            requests.get('%s/start' % os.environ['HEALTHCHECK_URL'], timeout=5)
+        except requests.exceptions.RequestException:
+            pass
+
     calls_table = db['calls']
 
     original_count = calls_table.count()
@@ -132,6 +138,9 @@ def scrape_active_calls(*args):
     logger.info(
         'Scraped %s active calls (%s new).' % (len(r.json()), num_added)
     )
+
+    if 'HEALTHCHECK_URL' in os.environ:
+        requests.get(os.environ['HEALTHCHECK_URL'])
 
 
 if __name__ == '__main__':
