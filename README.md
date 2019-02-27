@@ -1,4 +1,4 @@
-# DPD active calls scraper for AWS Lambda
+# DPD active calls scraper for AWS Lambda ![HealthCheck status](https://healthchecks.io/badge/87249993-895e-4417-996a-b6ee88/z0XtEiwa/dpd-call-scraper.svg)
 
 This scraper runs on AWS Lambda and scrapes DPD's [active calls list](https://www.dallasopendata.com/Police/Dallas-Police-Active-Calls/9fxf-t2tr) using the [Socrata API](https://dev.socrata.com/docs/endpoints.html). One call per incident number is saved to a PostgreSQL database, allowing us to store active call information that is otherwise purged from DPD's open data portal.
 
