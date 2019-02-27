@@ -12,6 +12,13 @@ import requests
 FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
             'exclude_system_fields=false')
 
+EMAIL_HEALTHCHECK_URL = (
+    'https://hc-ping.com/dd07eb0c-c57e-4575-9fab-8068e1db6a72'
+)
+SCRAPER_HEALTHCHECK_URL = (
+    'https://hc-ping.com/2ba25034-04bc-4f1a-8b57-49b1120c79c2'
+)
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -58,8 +65,14 @@ def generate_csv_report(from_time):
 
 def send_daily_report(*args):
     """Send a CSV with the last 25 hours of incident data"""
+    try:
+        requests.get('%s/start' % EMAIL_HEALTHCHECK_URL, timeout=5)
+    except requests.exceptions.RequestException:
+        pass
+
     if os.environ.get('REPORT_RECIPIENTS') is None:
         logger.info('Skipping daily report because REPORT_RECIPIENTS is empty')
+        requests.get(EMAIL_HEALTHCHECK_URL)
         return
 
     logger.info('E-mailing daily report.')
@@ -103,15 +116,15 @@ def send_daily_report(*args):
         report_time=datetime.now(),
         time_sent=datetime.now()
     ))
+    requests.get(EMAIL_HEALTHCHECK_URL)
 
 
 def scrape_active_calls(*args):
     """Scrape active calls and save them into our database"""
-    if 'HEALTHCHECK_URL' in os.environ:
-        try:
-            requests.get('%s/start' % os.environ['HEALTHCHECK_URL'], timeout=5)
-        except requests.exceptions.RequestException:
-            pass
+    try:
+        requests.get('%s/start' % SCRAPER_HEALTHCHECK_URL, timeout=5)
+    except requests.exceptions.RequestException:
+        pass
 
     calls_table = db['calls']
 
@@ -139,8 +152,7 @@ def scrape_active_calls(*args):
         'Scraped %s active calls (%s new).' % (len(r.json()), num_added)
     )
 
-    if 'HEALTHCHECK_URL' in os.environ:
-        requests.get(os.environ['HEALTHCHECK_URL'])
+    requests.get(SCRAPER_HEALTHCHECK_URL)
 
 
 if __name__ == '__main__':
