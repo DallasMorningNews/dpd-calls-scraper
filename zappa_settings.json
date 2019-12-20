@@ -5,7 +5,7 @@
         "aws_region": "us-east-1",
         "events": [{
           "function": "service.send_daily_report",
-          "expressions": ["cron(0 14 * * ? *)"]
+          "expressions": []
         }, {
           "function": "service.scrape_active_calls",
           "expressions": ["rate(10 minutes)"]
