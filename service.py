@@ -80,7 +80,6 @@ def send_daily_report(*args):
     # Go back a day, plus an hour to be safe
     from_datetime = datetime.now() - timedelta(days=1, hours=1)
     csv_report = generate_csv_report(from_datetime)
-
     report_filename = '%s-daily-report.csv' % datetime.strftime(
         from_datetime, '%Y%m%d'
     )
