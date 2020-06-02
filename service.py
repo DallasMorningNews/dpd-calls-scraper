@@ -8,6 +8,10 @@ import os
 import dataset
 import requests
 
+import sentry_sdk
+sentry_sdk.init("https://000d6ee8e0734404aeaeab2cd07afa27@o101507.ingest.sentry.io/5262187")
+
+
 
 FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
             'exclude_system_fields=false')
