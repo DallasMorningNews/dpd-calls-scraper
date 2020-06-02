@@ -120,56 +120,37 @@ def send_daily_report(*args):
 
 def convert24(str1):
 
-    # Checking if last two elements of time
-    # is AM and first two elements are 12
-    timestr = ''
-
-    if str1[-2:] == "AM" and str1[:2] == "12":
-        timestr = "00" + str1[2:-2]
-
-    # remove the AM
-    elif str1[-2:] == "AM":
-        timestr = str1[:-2]
-
-    # Checking if last two elements of time
-    # is PM and first two elements are 12
-    elif str1[-2:] == "PM" and str1[:2] == "12":
-        timestr = str1[:-2]
-
-    else:
-        # add 12 to hours and remove PM
-        timestr = str(int(str1[:2]) + 12) + str1[2:8]
-
-    return timestr.strip()
+    date_time_string = datetime.strptime(str1, '%I:%M%p')
+    return date_time_string.strftime('%H:%M:%S')
 
 
 def parse_time_string(time_str):
-    date_split = time_str.split(' ')
-    months = {
-        'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-        'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-        'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
-        }
-    new_date_split = []
-    for v in date_split:
-        if v:
-            new_date_split.append(v)
+    # date_split = time_str.split(' ')
+    # months = {
+    #     'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+    #     'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+    #     'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
+    #     }
+    # new_date_split = []
+    # for v in date_split:
+    #     if v:
+    #         new_date_split.append(v)
 
-    month = months[new_date_split[0]]
-    day = new_date_split[1]
-    year = new_date_split[2]
-    time_split = new_date_split[3].split(":")
-    hour = time_split[0]
-    minute = time_split[1][:2]
-    ampm = time_split[1][2:]
+    # month = months[new_date_split[0]]
+    # day = new_date_split[1]
+    # year = new_date_split[2]
+    # time_split = new_date_split[3].split(":")
+    # hour = time_split[0]
+    # minute = time_split[1][:2]
+    # ampm = time_split[1][2:]
 
-    datestr = '{}-{}-{}'.format(year, month, day)
-    timestr = '{}:{}:00 {}'.format(hour, minute, ampm)
-    timefinal = convert24(timestr)
+    # datestr = '{}-{}-{}'.format(year, month, day)
+    # timestr = '{}:{}:00 {}'.format(hour, minute, ampm)
+    # timefinal = convert24(timestr)
 
-    datetimestr = '{}T{}'.format(datestr, timefinal)
+    # datetimestr = '{}T{}'.format(datestr, timefinal)
 
-    timefinal = datetime.strptime(datetimestr, '%Y-%m-%dT%H:%M:%S')
+    timefinal = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
 
     return timefinal
 
@@ -189,6 +170,12 @@ def scrape_active_calls(*args):
     r.raise_for_status()
 
     for active_call in r.json():
+        calldate = active_call['date'].split('T')[0]
+        # convert the time of the incident to 24 hour format
+        calltime = convert24(active_call['time'])
+        # add the date and time back as a complete date_time string to the call
+        active_call['date_time'] = calldate + 'T' + calltime
+      
         parsed_dates = {
             'date_time_dt': parse_time_string(active_call['date_time']),
             ':created_at_dt': parse_time(active_call[':created_at']),
