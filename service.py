@@ -176,9 +176,9 @@ def scrape_active_calls(*args):
     for active_call in r.json():
         calldate = active_call['date'].split('T')[0]
         # convert the time of the incident to 24 hour format
-        calltime = convert24(active_call['time'])
+        # calltime = convert24(active_call['time'])
         # add the date and time back as a complete date_time string to the call
-        active_call['date_time'] = calldate + 'T' + calltime
+        active_call['date_time'] = calldate + 'T' + active_call['time']
       
         parsed_dates = {
             'date_time_dt': parse_time_string(active_call['date_time']),
