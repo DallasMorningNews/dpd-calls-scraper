@@ -8,7 +8,6 @@ dataset = "*"
 requests = "*"
 "psycopg2-binary" = "*"
 sentry-sdk = "==0.14.4"
-zappa = "*"
 
 [dev-packages]
 zappa = "*"
