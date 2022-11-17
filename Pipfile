@@ -8,9 +8,10 @@ dataset = "*"
 requests = "*"
 "psycopg2-binary" = "*"
 sentry-sdk = "==0.14.4"
+zappa = "*"
 
 [dev-packages]
 zappa = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"
