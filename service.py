@@ -205,4 +205,4 @@ def scrape_active_calls(*args):
 if __name__ == '__main__':
     logging.basicConfig()
     scrape_active_calls()
-    send_daily_report()
+    # send_daily_report()
