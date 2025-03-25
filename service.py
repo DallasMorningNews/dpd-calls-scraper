@@ -19,6 +19,7 @@ FEED_URL = ('https://www.dallasopendata.com/resource/are8-xahz.json?$$'
 EMAIL_HEALTHCHECK_URL = (
     'https://hc-ping.com/dd07eb0c-c57e-4575-9fab-8068e1db6a72'
 )
+
 SCRAPER_HEALTHCHECK_URL = (
     'https://hc-ping.com/2ba25034-04bc-4f1a-8b57-49b1120c79c2'
 )
@@ -204,3 +205,4 @@ def scrape_active_calls(*args):
 if __name__ == '__main__':
     logging.basicConfig()
     scrape_active_calls()
+    send_daily_report()
